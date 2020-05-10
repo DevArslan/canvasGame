@@ -7,10 +7,12 @@ var ctx = canvas.getContext("2d");
 
 var heavyTank = new Image();
 var lightTank = new Image();   
-var bulletSprite = new Image();   
+var bulletSprite = new Image();
+var enemySprite = new Image();
 heavyTank.src = 'images/HeavyTank.png'; 
 lightTank.src = 'images/LightTank.png'; 
 bulletSprite.src = 'images/bullet.png';
+enemySprite.src = 'images/enemy.png'
 
 // кнопки
 var pressedLeft = false; // лево
@@ -44,6 +46,9 @@ var money = 0
 var health = 1
 var healthCost = 400
 
+var moveSpeed = 3
+var moveSpeedCost = 20
+var moveSpeedCostDisplay =document.querySelector('.moveSpeedCost')
 
 document.addEventListener("keydown", keyDown, false);
 document.addEventListener("keyup", keyUp, false);
@@ -145,14 +150,14 @@ var dBullet = {
 		// ctx.arc(bullet[i].x, bullet[i].y, 5, 0, 2 * Math.PI);
 		// ctx.fillStyle = "red";
 		// ctx.fill();
-		ctx.drawImage(bulletSprite,bullet[i].x, bullet[i].y, 13, 30)
+		ctx.drawImage(bulletSprite,bullet[i].x, bullet[i].y, 6.5, 15)
 		
 		ctx.closePath();
 	}
 }
 
 var enemy = {
-	width: 20,
+	width: 30,
 	height: 20,
 }
 var reverseEnemiesArray = []
@@ -167,9 +172,9 @@ function createEnemies(columnCount,rowCount){
 	enemyY = rowCount*(enemy.height+20)
 	enemies[rowCount] = { y: enemyY}
 	if(columnCount < 6){
-		offSet = Math.ceil(Math.random()*500)
+		offSet = Math.ceil(Math.random()*300)+50
 	}else{
-		offSet = Math.ceil(Math.random()*500)
+		offSet = Math.ceil(Math.random()*300)+50
 	}
 	
 	for(let column = 0; column <= columnCount; column++){
@@ -186,10 +191,14 @@ function drawEnemies() {
 				let enemyX = enemies[column][item].x + enemies[column][item].offSetLeft
 				let enemyY = enemies[column][item].y/column*(enemies.length-column)
 				ctx.beginPath();
-				ctx.rect(enemyX, enemyY, enemy.width, enemy.height);
-				ctx.fillStyle = "black";
-				ctx.fill();
+				// ctx.rect(enemyX, enemyY, enemy.width, enemy.height);
+				// ctx.fillStyle = "black";
+				// ctx.fill();
+				ctx.drawImage(enemySprite,enemyX, enemyY, enemy.width, enemy.height)
 				ctx.closePath();
+
+				
+
 				if(enemies[column][item].y/column*(enemies.length-column) > canvas.height){
 					health -= 1;
 					if(health == 0){
@@ -219,12 +228,12 @@ function moneyMake(){
 	money++
 	moneyCount.innerHTML = 'Money:' + money.toFixed(1)
 }
-function buySpeedAtack(){
+function buySpeedAttack(){
 	if(money > speedAttackCost){
-		speedAttack -= 4;
+		speedAttack -= 3;
 		console.log(speedAttack)
 		money -= speedAttackCost;
-		speedAttackCost = Math.round(speedAttackCost*2)
+		speedAttackCost = Math.round(speedAttackCost*1.1)
 	}else{
 		console.log("не хватает денег")
 	}
@@ -239,7 +248,16 @@ function buyHealth() {
 		console.log("не хватает денег")
 	}
 }
-
+function buySpeed() {
+	if(money > moveSpeedCost){
+		moveSpeed += 3;
+		money -= moveSpeedCost;
+		moveSpeedCost = Math.round(moveSpeedCost*1.5)
+	}else{
+		console.log("не хватает денег")
+	}
+	moveSpeedCostDisplay.innerHTML = 'Стоимость скорости передвижения' +  moveSpeedCost
+}
 function draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -279,11 +297,11 @@ function draw() {
 	player.draw();
     
 	if(pressedRight && 0 < player.x) {
-		player.x -= 3;
+		player.x -= moveSpeed;
 	}
     
 	if(pressedLeft && player.x < canvas.width - player.pW) {
-		player.x += 3;
+		player.x += moveSpeed;
 	}
 
 // player 2 //
@@ -328,11 +346,11 @@ function draw() {
 	player2.draw();
     
 	if(pressedLeftForSecondPlayer && 0 < player2.x) {
-		player2.x -= 3;
+		player2.x -= moveSpeed;
 	}
 	 
 	if(pressedRightForSecondPlayer && player2.x < canvas.width - player2.pW) {
-		player2.x += 3;
+		player2.x += moveSpeed;
 	}
 	try {
 		for(let i = 0; i < bullet.length; i++){
