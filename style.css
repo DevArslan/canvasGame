@@ -1,0 +1,17 @@
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: antiquewhite;
+}
+canvas{
+    background-color: white;
+}
+.money{
+    margin-left: 30px;
+    border: 1px solid black;
+}
+.shop{
+    margin-left: 30px;
+    border: 1px solid black;
+}
